@@ -1,4 +1,6 @@
 import { BrowserRouter, Link, Navigate, Outlet, Route, Routes } from 'react-router-dom'
+import { RequireAuth } from './components/RequireAuth/RequireAuth'
+import { SignIn } from './components/SignIn/SignIn'
 
 function RootLayout() {
   return (
@@ -27,10 +29,10 @@ function App() {
       <Routes>
         <Route path="/" element={<RootLayout />}>
           <Route index element={<Navigate to="/signin" replace />} />
-          <Route path="signin" element={<PlaceholderPage title="Sign in" />} />
+          <Route path="signin" element={<SignIn />} />
           <Route path="profiles" element={<PlaceholderPage title="Profiles" />} />
-          <Route path="browse" element={<PlaceholderPage title="Browse" />} />
-          <Route path="watch/:id" element={<PlaceholderPage title="Watch" />} />
+          <Route path="browse" element={<RequireAuth><PlaceholderPage title="Browse" /></RequireAuth>} />
+          <Route path="watch/:id" element={<RequireAuth><PlaceholderPage title="Watch" /></RequireAuth>} />
           <Route path="insights" element={<PlaceholderPage title="Insights" />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>

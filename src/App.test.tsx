@@ -1,10 +1,12 @@
 import { afterEach, expect, it } from 'vitest'
 import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import App from './App'
+import { useAuth } from './store/auth'
 
 afterEach(() => cleanup())
 
 it('redirects the root path to sign in', async () => {
+  useAuth.setState({ email: null })
   window.history.replaceState({}, '', '/')
   render(<App />)
 
@@ -18,6 +20,7 @@ it.each([
   ['/watch/sample', 'Watch'],
   ['/insights', 'Insights'],
 ])('renders the %s placeholder', (path, heading) => {
+  useAuth.setState({ email: 'viewer@example.com' })
   window.history.replaceState({}, '', path)
   render(<App />)
 
