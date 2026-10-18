@@ -1,0 +1,32 @@
+:root {
+  --background: #0b0b12;
+  --surface: #14141f;
+  --text: #f5f5fa;
+  --muted: #9a9ab0;
+  --accent: #8b5cf6;
+  --highlight: #ff7a59;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+  --font-display: 'Sora', sans-serif;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1.25rem;
+  --shadow-card: 0 12px 32px rgb(0 0 0 / 0.3);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-highlight: var(--highlight);
+  --font-sans: var(--font-body);
+  --font-heading: var(--font-display);
+  --radius-control: var(--radius-sm);
+  --radius-card: var(--radius-md);
+  --shadow-elevated: var(--shadow-card);
+}
