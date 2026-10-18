@@ -11,7 +11,7 @@ export const ROTATE_INTERVAL = 12000
 
 interface HeroProps {
   titles?: Title[]
-  onMoreInfo?: (title: Title) => void
+  onMoreInfo?: (title: Title, opener: HTMLButtonElement) => void
 }
 
 export function Hero({ titles = featured(), onMoreInfo }: HeroProps) {
@@ -94,7 +94,7 @@ export function Hero({ titles = featured(), onMoreInfo }: HeroProps) {
         <p className="text-base text-text/90 sm:text-lg">{title.synopsis}</p>
         <div className="flex gap-3">
           <Button onClick={() => navigate(`/watch/${title.id}`)}>▶ Play</Button>
-          <Button className="bg-surface/80!" onClick={() => onMoreInfo?.(title)}>More Info</Button>
+          <Button className="bg-surface/80!" onClick={(event) => onMoreInfo?.(title, event.currentTarget)}>More Info</Button>
         </div>
       </motion.div>
 

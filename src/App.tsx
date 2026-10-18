@@ -1,11 +1,15 @@
+import { useCallback, useState } from 'react'
+import { AnimatePresence } from 'framer-motion'
 import { BrowserRouter, Link, Navigate, Outlet, Route, Routes } from 'react-router-dom'
 import { byGenre, genres } from './catalog'
+import type { Title } from './catalog'
 import { Hero } from './components/Hero/Hero'
 import { Navbar } from './components/Navbar/Navbar'
 import { ProfilePicker } from './components/ProfilePicker/ProfilePicker'
 import { RequireAuth } from './components/RequireAuth/RequireAuth'
 import { Row } from './components/Row/Row'
 import { SignIn } from './components/SignIn/SignIn'
+import { TitleModal } from './components/TitleModal/TitleModal'
 
 function RootLayout() {
   return (
@@ -31,15 +35,36 @@ function PlaceholderPage({ title }: { title: string }) {
 }
 
 function BrowsePage() {
+  const [selected, setSelected] = useState<{ title: Title; opener: HTMLElement; layoutId?: string } | null>(null)
+  const closeModal = useCallback(() => setSelected(null), [])
+
+  function openModal(title: Title, opener: HTMLElement, layoutId?: string) {
+    const rect = opener.getBoundingClientRect()
+    const visible = rect.width > 0 && rect.height > 0 && rect.top < window.innerHeight && rect.bottom > 0
+      && rect.left < window.innerWidth && rect.right > 0
+    setSelected({ title, opener, layoutId: visible ? layoutId : undefined })
+  }
+
   return (
     <div className="-mx-6 -mt-20 space-y-8 pb-12">
       <h1 className="sr-only">Browse</h1>
-      <Hero />
+      <Hero onMoreInfo={(title, opener) => openModal(title, opener)} />
       <div className="space-y-6">
         {genres.map((genre) => (
-          <Row key={genre} title={genre} titles={byGenre(genre)} />
+          <Row key={genre} title={genre} titles={byGenre(genre)} onOpen={openModal} />
         ))}
       </div>
+      <AnimatePresence>
+        {selected && (
+          <TitleModal
+            title={selected.title}
+            layoutId={selected.layoutId}
+            opener={selected.opener}
+            onClose={closeModal}
+            onSelect={(title) => setSelected({ ...selected, title, layoutId: undefined })}
+          />
+        )}
+      </AnimatePresence>
     </div>
   )
 }

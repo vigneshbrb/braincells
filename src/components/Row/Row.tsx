@@ -8,10 +8,11 @@ export interface RowProps {
   titles: Title[]
   onPlay?: (title: Title) => void
   onAdd?: (title: Title) => void
+  onOpen?: (title: Title, opener: HTMLButtonElement, layoutId: string) => void
   className?: string
 }
 
-export function Row({ title, titles, onPlay, onAdd, className = '' }: RowProps) {
+export function Row({ title, titles, onPlay, onAdd, onOpen, className = '' }: RowProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [canScrollLeft, setCanScrollLeft] = useState(false)
   const [canScrollRight, setCanScrollRight] = useState(titles.length > 0)
@@ -82,7 +83,7 @@ export function Row({ title, titles, onPlay, onAdd, className = '' }: RowProps) 
         >
           {titles.map((item) => (
             <div key={item.id} className="snap-start shrink-0">
-              <PosterCard title={item} onPlay={onPlay} onAdd={onAdd} />
+              <PosterCard title={item} onPlay={onPlay} onAdd={onAdd} onOpen={onOpen} layoutId={`title-${title}-${item.id}`} />
             </div>
           ))}
         </div>

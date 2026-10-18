@@ -11,10 +11,12 @@ export interface PosterCardProps {
   title: Title
   onPlay?: (title: Title) => void
   onAdd?: (title: Title) => void
+  onOpen?: (title: Title, opener: HTMLButtonElement, layoutId: string) => void
+  layoutId?: string
   className?: string
 }
 
-export function PosterCard({ title, onPlay, onAdd, className = '' }: PosterCardProps) {
+export function PosterCard({ title, onPlay, onAdd, onOpen, layoutId, className = '' }: PosterCardProps) {
   const [hovered, setHovered] = useState(false)
   const timerRef = useRef<number | null>(null)
   const navigate = useNavigate()
@@ -60,7 +62,7 @@ export function PosterCard({ title, onPlay, onAdd, className = '' }: PosterCardP
       data-testid="poster-card"
       data-hovered={hovered}
       aria-label={title.name}
-      tabIndex={0}
+      layoutId={layoutId}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onFocus={handleFocus}
@@ -73,7 +75,15 @@ export function PosterCard({ title, onPlay, onAdd, className = '' }: PosterCardP
       style={posterStyle(title.posterSeed)}
       className={`relative aspect-[2/3] w-44 shrink-0 cursor-pointer overflow-hidden rounded-card p-4 shadow-elevated focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-highlight ${className}`}
     >
-      <div className="flex h-full flex-col justify-between">
+      {onOpen && (
+        <button
+          type="button"
+          aria-label={`More info about ${title.name}`}
+          className="absolute inset-0 z-0 rounded-card focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-highlight"
+          onClick={(event) => onOpen(title, event.currentTarget, layoutId ?? `title-${title.id}`)}
+        />
+      )}
+      <div className="pointer-events-none relative flex h-full flex-col justify-between">
         <div className="flex items-start justify-between text-xs font-semibold">
           <span className="rounded-control bg-background/60 px-1.5 py-0.5 backdrop-blur-xs">
             {title.maturity}
@@ -92,7 +102,7 @@ export function PosterCard({ title, onPlay, onAdd, className = '' }: PosterCardP
               initial={reduced ? { opacity: 1 } : { opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: reduced ? 0 : 0.15 }}
-              className="flex items-center gap-2 pt-1"
+              className="pointer-events-auto flex items-center gap-2 pt-1"
             >
               <Button
                 aria-label="Play"
