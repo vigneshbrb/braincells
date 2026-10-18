@@ -1,4 +1,5 @@
 import { BrowserRouter, Link, Navigate, Outlet, Route, Routes } from 'react-router-dom'
+import { ProfilePicker } from './components/ProfilePicker/ProfilePicker'
 import { RequireAuth } from './components/RequireAuth/RequireAuth'
 import { SignIn } from './components/SignIn/SignIn'
 
@@ -30,7 +31,7 @@ function App() {
         <Route path="/" element={<RootLayout />}>
           <Route index element={<Navigate to="/signin" replace />} />
           <Route path="signin" element={<SignIn />} />
-          <Route path="profiles" element={<PlaceholderPage title="Profiles" />} />
+          <Route path="profiles" element={<ProfilePicker />} />
           <Route path="browse" element={<RequireAuth><PlaceholderPage title="Browse" /></RequireAuth>} />
           <Route path="watch/:id" element={<RequireAuth><PlaceholderPage title="Watch" /></RequireAuth>} />
           <Route path="insights" element={<PlaceholderPage title="Insights" />} />

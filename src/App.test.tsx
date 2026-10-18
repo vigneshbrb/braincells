@@ -15,7 +15,7 @@ it('redirects the root path to sign in', async () => {
 })
 
 it.each([
-  ['/profiles', 'Profiles'],
+  ['/profiles', "Who's watching?"],
   ['/browse', 'Browse'],
   ['/watch/sample', 'Watch'],
   ['/insights', 'Insights'],
