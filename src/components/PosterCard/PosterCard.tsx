@@ -1,0 +1,124 @@
+import { useEffect, useRef, useState } from 'react'
+import { motion } from 'framer-motion'
+import { useNavigate } from 'react-router-dom'
+import { posterStyle, type Title } from '../../catalog'
+import { useMotion } from '../../motion'
+import { Button } from '../Button/Button'
+
+export const HOVER_DELAY = 300
+
+export interface PosterCardProps {
+  title: Title
+  onPlay?: (title: Title) => void
+  onAdd?: (title: Title) => void
+  className?: string
+}
+
+export function PosterCard({ title, onPlay, onAdd, className = '' }: PosterCardProps) {
+  const [hovered, setHovered] = useState(false)
+  const timerRef = useRef<number | null>(null)
+  const navigate = useNavigate()
+  const { reduced } = useMotion()
+
+  const clearTimer = () => {
+    if (timerRef.current !== null) {
+      window.clearTimeout(timerRef.current)
+      timerRef.current = null
+    }
+  }
+
+  const handleMouseEnter = () => {
+    clearTimer()
+    timerRef.current = window.setTimeout(() => {
+      setHovered(true)
+    }, HOVER_DELAY)
+  }
+
+  const handleMouseLeave = () => {
+    clearTimer()
+    setHovered(false)
+  }
+
+  const handleFocus = () => {
+    clearTimer()
+    timerRef.current = window.setTimeout(() => {
+      setHovered(true)
+    }, HOVER_DELAY)
+  }
+
+  const handleBlur = () => {
+    clearTimer()
+    setHovered(false)
+  }
+
+  useEffect(() => {
+    return () => clearTimer()
+  }, [])
+
+  return (
+    <motion.article
+      data-testid="poster-card"
+      data-hovered={hovered}
+      aria-label={title.name}
+      tabIndex={0}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
+      animate={{
+        scale: reduced ? 1 : hovered ? 1.15 : 1,
+        zIndex: hovered ? 20 : 1,
+      }}
+      transition={{ duration: reduced ? 0 : 0.25, ease: [0.2, 0.8, 0.2, 1] }}
+      style={posterStyle(title.posterSeed)}
+      className={`relative aspect-[2/3] w-44 shrink-0 cursor-pointer overflow-hidden rounded-card p-4 shadow-elevated focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-highlight ${className}`}
+    >
+      <div className="flex h-full flex-col justify-between">
+        <div className="flex items-start justify-between text-xs font-semibold">
+          <span className="rounded-control bg-background/60 px-1.5 py-0.5 backdrop-blur-xs">
+            {title.maturity}
+          </span>
+          <span className="text-text/80">{title.duration}m</span>
+        </div>
+
+        <div className="space-y-2">
+          <h4 className="font-heading text-base font-bold leading-tight drop-shadow-md">
+            {title.name}
+          </h4>
+
+          {hovered && (
+            <motion.div
+              data-testid="poster-card-actions"
+              initial={reduced ? { opacity: 1 } : { opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: reduced ? 0 : 0.15 }}
+              className="flex items-center gap-2 pt-1"
+            >
+              <Button
+                aria-label="Play"
+                className="size-8 p-0! text-xs font-bold"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  if (onPlay) onPlay(title)
+                  else navigate(`/watch/${title.id}`)
+                }}
+              >
+                ▶
+              </Button>
+              <Button
+                aria-label="Add"
+                className="size-8 bg-surface/80! p-0! text-xs font-bold"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onAdd?.(title)
+                }}
+              >
+                +
+              </Button>
+            </motion.div>
+          )}
+        </div>
+      </div>
+    </motion.article>
+  )
+}
