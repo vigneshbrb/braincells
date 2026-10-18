@@ -3,8 +3,10 @@ import { AnimatePresence } from 'framer-motion'
 import { BrowserRouter, Link, Navigate, Outlet, Route, Routes } from 'react-router-dom'
 import { byGenre, genres } from './catalog'
 import type { Title } from './catalog'
+import { ContinueRow } from './components/ContinueRow/ContinueRow'
 import { Hero } from './components/Hero/Hero'
 import { Navbar } from './components/Navbar/Navbar'
+import { Player } from './components/Player/Player'
 import { ProfilePicker } from './components/ProfilePicker/ProfilePicker'
 import { RequireAuth } from './components/RequireAuth/RequireAuth'
 import { Row } from './components/Row/Row'
@@ -50,6 +52,7 @@ function BrowsePage() {
       <h1 className="sr-only">Browse</h1>
       <Hero onMoreInfo={(title, opener) => openModal(title, opener)} />
       <div className="space-y-6">
+        <ContinueRow onOpen={openModal} />
         {genres.map((genre) => (
           <Row key={genre} title={genre} titles={byGenre(genre)} onOpen={openModal} />
         ))}
@@ -88,7 +91,7 @@ function App() {
           <Route path="profiles" element={<ProfilePicker />} />
           <Route element={<AppLayout />}>
             <Route path="browse" element={<RequireAuth><BrowsePage /></RequireAuth>} />
-            <Route path="watch/:id" element={<RequireAuth><PlaceholderPage title="Watch" /></RequireAuth>} />
+            <Route path="watch/:id" element={<RequireAuth><Player /></RequireAuth>} />
             <Route path="insights" element={<PlaceholderPage title="Insights" />} />
           </Route>
           <Route path="*" element={<NotFoundPage />} />

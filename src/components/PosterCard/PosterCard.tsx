@@ -14,9 +14,10 @@ export interface PosterCardProps {
   onOpen?: (title: Title, opener: HTMLButtonElement, layoutId: string) => void
   layoutId?: string
   className?: string
+  progress?: number
 }
 
-export function PosterCard({ title, onPlay, onAdd, onOpen, layoutId, className = '' }: PosterCardProps) {
+export function PosterCard({ title, onPlay, onAdd, onOpen, layoutId, className = '', progress }: PosterCardProps) {
   const [hovered, setHovered] = useState(false)
   const timerRef = useRef<number | null>(null)
   const navigate = useNavigate()
@@ -129,6 +130,20 @@ export function PosterCard({ title, onPlay, onAdd, onOpen, layoutId, className =
           )}
         </div>
       </div>
+      {typeof progress === 'number' && (
+        <div
+          data-testid="poster-progress-track"
+          className="absolute inset-x-0 bottom-0 h-1.5 bg-surface/80"
+        >
+          <motion.div
+            data-testid="poster-progress-bar"
+            initial={{ width: 0 }}
+            animate={{ width: `${Math.min(Math.max(progress, 0), 100)}%` }}
+            transition={{ duration: reduced ? 0 : 0.45, ease: [0.2, 0.8, 0.2, 1] }}
+            className="h-full bg-highlight"
+          />
+        </div>
+      )}
     </motion.article>
   )
 }
