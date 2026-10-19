@@ -6,7 +6,7 @@
 - [x] 1.3 README
 
 ## 2. Tests
-- [ ] 2.1 Run e2e locally and in CI
+- [x] 2.1 Run e2e locally and in CI
 
 ## 3. Ship
-- [ ] 3.1 Tag v1.0.0
+- [x] 3.1 Tag v1.0.0
