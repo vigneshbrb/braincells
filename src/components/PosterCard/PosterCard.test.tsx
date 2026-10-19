@@ -2,6 +2,7 @@ import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { byGenre } from '../../catalog'
+import { useRatings } from '../../store/ratings'
 import { HOVER_DELAY, PosterCard } from './PosterCard'
 
 const mockNavigate = vi.fn()
@@ -24,6 +25,30 @@ function stubReducedMotion(reduced: boolean) {
 beforeEach(() => {
   vi.useFakeTimers()
   mockNavigate.mockClear()
+  useRatings.setState({ ratings: {} })
+})
+
+it('rates from hover actions without opening the title', () => {
+  stubReducedMotion(true)
+  const onOpen = vi.fn()
+  render(<MemoryRouter><PosterCard title={sampleTitle} onOpen={onOpen} /></MemoryRouter>)
+  fireEvent.mouseEnter(screen.getByTestId('poster-card'))
+  act(() => vi.advanceTimersByTime(HOVER_DELAY))
+  fireEvent.click(screen.getByRole('button', { name: 'Thumbs down' }))
+  expect(useRatings.getState().getRating('default', sampleTitle.id)).toBe('down')
+  expect(onOpen).not.toHaveBeenCalled()
+})
+
+it('keeps rating actions available while keyboard focus moves inside the card', () => {
+  stubReducedMotion(true)
+  render(<MemoryRouter><PosterCard title={sampleTitle} onOpen={vi.fn()} /></MemoryRouter>)
+  const opener = screen.getByRole('button', { name: `More info about ${sampleTitle.name}` })
+  fireEvent.focus(opener)
+  act(() => vi.advanceTimersByTime(HOVER_DELAY))
+  const down = screen.getByRole('button', { name: 'Thumbs down' })
+  fireEvent.blur(opener, { relatedTarget: down })
+  fireEvent.focus(down)
+  expect(screen.getByRole('button', { name: 'Thumbs down' })).toBeTruthy()
 })
 
 afterEach(() => {

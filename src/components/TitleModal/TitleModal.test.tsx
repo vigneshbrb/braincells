@@ -3,11 +3,21 @@ import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-li
 import App from '../../App'
 import { byGenre } from '../../catalog'
 import { useAuth } from '../../store/auth'
+import { useRatings } from '../../store/ratings'
 
 beforeEach(() => {
+  useRatings.setState({ ratings: {} })
   vi.stubGlobal('matchMedia', () => ({ matches: true, addEventListener: () => {}, removeEventListener: () => {} }))
   useAuth.setState({ email: 'viewer@example.com' })
   window.history.replaceState({}, '', '/browse')
+})
+
+it('rates a title from its modal', () => {
+  render(<App />)
+  const title = byGenre('Focus')[0]
+  fireEvent.click(screen.getAllByRole('button', { name: `More info about ${title.name}` })[0])
+  fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Double thumbs up' }))
+  expect(useRatings.getState().getRating('default', title.id)).toBe('double-up')
 })
 
 afterEach(() => {

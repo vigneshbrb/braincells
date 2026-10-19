@@ -6,6 +6,7 @@ import { useMotion } from '../../motion'
 import { useProfiles } from '../../store/profiles'
 import { selectMyList, useMyList } from '../../store/myList'
 import { Button } from '../Button/Button'
+import { RatingControl } from '../RatingControl/RatingControl'
 
 export const HOVER_DELAY = 300
 
@@ -61,7 +62,8 @@ export function PosterCard({ title, onPlay, onAdd, onOpen, layoutId, className =
     }, HOVER_DELAY)
   }
 
-  const handleBlur = () => {
+  const handleBlur = (event: React.FocusEvent<HTMLElement>) => {
+    if (event.currentTarget.contains(event.relatedTarget)) return
     clearTimer()
     setHovered(false)
   }
@@ -115,36 +117,39 @@ export function PosterCard({ title, onPlay, onAdd, onOpen, layoutId, className =
               initial={reduced ? { opacity: 1 } : { opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: reduced ? 0 : 0.15 }}
-              className="pointer-events-auto flex items-center gap-2 pt-1"
+              className="pointer-events-auto flex flex-col gap-2 pt-1"
             >
-              <Button
-                aria-label="Play"
-                className="size-8 p-0! text-xs font-bold"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  if (onPlay) onPlay(title)
-                  else navigate(`/watch/${title.id}`)
-                }}
-              >
-                ▶
-              </Button>
-              <Button
-                aria-label={isInList ? 'Remove from My List' : 'Add to My List'}
-                className="size-8 bg-surface/80! p-0! text-xs font-bold"
-                onClick={handleToggle}
-              >
-                <AnimatePresence mode="wait" initial={false}>
-                  <motion.span
-                    key={isInList ? 'check' : 'plus'}
-                    initial={{ opacity: 0, scale: 0.5, rotate: -90 }}
-                    animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                    exit={{ opacity: 0, scale: 0.5, rotate: 90 }}
-                    transition={{ duration: reduced ? 0 : 0.2 }}
-                  >
-                    {isInList ? '✓' : '+'}
-                  </motion.span>
-                </AnimatePresence>
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  aria-label="Play"
+                  className="size-8 p-0! text-xs font-bold"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    if (onPlay) onPlay(title)
+                    else navigate(`/watch/${title.id}`)
+                  }}
+                >
+                  ▶
+                </Button>
+                <Button
+                  aria-label={isInList ? 'Remove from My List' : 'Add to My List'}
+                  className="size-8 bg-surface/80! p-0! text-xs font-bold"
+                  onClick={handleToggle}
+                >
+                  <AnimatePresence mode="wait" initial={false}>
+                    <motion.span
+                      key={isInList ? 'check' : 'plus'}
+                      initial={{ opacity: 0, scale: 0.5, rotate: -90 }}
+                      animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                      exit={{ opacity: 0, scale: 0.5, rotate: 90 }}
+                      transition={{ duration: reduced ? 0 : 0.2 }}
+                    >
+                      {isInList ? '✓' : '+'}
+                    </motion.span>
+                  </AnimatePresence>
+                </Button>
+              </div>
+              <RatingControl titleId={title.id} />
             </motion.div>
           )}
         </div>

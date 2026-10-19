@@ -6,6 +6,7 @@ import { useMotion } from '../../motion'
 import { useProfiles } from '../../store/profiles'
 import { selectMyList, useMyList } from '../../store/myList'
 import { Button } from '../Button/Button'
+import { RatingControl } from '../RatingControl/RatingControl'
 
 interface TitleModalProps {
   title: Title
@@ -111,7 +112,7 @@ export function TitleModal({ title, layoutId, opener, onClose, onSelect }: Title
           </p>
           <p>{title.synopsis}</p>
           <p className="text-sm text-muted">{title.genres.join(' · ')}</p>
-          <div className="flex gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <Button onClick={() => navigate(`/watch/${title.id}`)}>▶ Play</Button>
             <Button className="bg-surface/80!" onClick={handleToggle}>
               <AnimatePresence mode="wait" initial={false}>
@@ -127,6 +128,7 @@ export function TitleModal({ title, layoutId, opener, onClose, onSelect }: Title
               </AnimatePresence>
               <span className="ml-1.5">{isInList ? 'In My List' : 'My List'}</span>
             </Button>
+            <RatingControl titleId={title.id} />
           </div>
           {similar.length > 0 && (
             <section aria-label="More like this" className="space-y-3">
