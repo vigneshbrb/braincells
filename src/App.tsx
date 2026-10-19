@@ -1,10 +1,11 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { byId } from './catalog'
-import { AnimatePresence } from 'framer-motion'
-import { BrowserRouter, Link, Navigate, Outlet, Route, Routes } from 'react-router-dom'
+import { AnimatePresence, motion } from 'framer-motion'
+import { BrowserRouter, Link, Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom'
 import { byGenre, genres } from './catalog'
 import type { Title } from './catalog'
 import { ContinueRow } from './components/ContinueRow/ContinueRow'
+import { ErrorBoundary } from './components/ErrorBoundary/ErrorBoundary'
 import { Hero } from './components/Hero/Hero'
 import { MyListRow } from './components/MyListRow/MyListRow'
 import { Navbar } from './components/Navbar/Navbar'
@@ -15,10 +16,12 @@ import { RequireAuth } from './components/RequireAuth/RequireAuth'
 import { Row } from './components/Row/Row'
 import { SignIn } from './components/SignIn/SignIn'
 import { SearchPage } from './components/SearchPage/SearchPage'
+import { Skeleton } from './components/Skeleton/Skeleton'
 import { TitleModal } from './components/TitleModal/TitleModal'
 import { Top10Row } from './components/Top10Row/Top10Row'
 import { useProfiles } from './store/profiles'
 import { selectMyList, useMyList } from './store/myList'
+import { useMotion } from './motion'
 
 function RootLayout() {
   return (
@@ -44,8 +47,15 @@ function PlaceholderPage({ title }: { title: string }) {
 }
 
 function BrowsePage() {
+  const [ready, setReady] = useState(false)
   const [selected, setSelected] = useState<{ title: Title; opener: HTMLElement; layoutId?: string } | null>(null)
   const closeModal = useCallback(() => setSelected(null), [])
+  const { reduced } = useMotion()
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setReady(true), 400)
+    return () => window.clearTimeout(timer)
+  }, [])
 
   function openModal(title: Title, opener: HTMLElement, layoutId?: string) {
     const rect = opener.getBoundingClientRect()
@@ -57,15 +67,24 @@ function BrowsePage() {
   return (
     <div className="-mx-6 -mt-20 space-y-8 pb-12">
       <h1 className="sr-only">Browse</h1>
-      <Hero onMoreInfo={(title, opener) => openModal(title, opener)} />
-      <div className="space-y-6">
-        <ContinueRow onOpen={openModal} />
-        <MyListRow onOpen={openModal} />
-        <Top10Row onOpen={openModal} />
-        {genres.map((genre) => (
-          <Row key={genre} title={genre} titles={byGenre(genre)} onOpen={openModal} />
-        ))}
-      </div>
+      {ready ? (
+        <motion.div
+          initial={reduced ? false : { opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: reduced ? 0 : 0.25 }}
+          className="space-y-8"
+        >
+          <Hero onMoreInfo={(title, opener) => openModal(title, opener)} />
+          <div className="space-y-6">
+            <ContinueRow onOpen={openModal} />
+            <MyListRow onOpen={openModal} />
+            <Top10Row onOpen={openModal} />
+            {genres.map((genre) => (
+              <Row key={genre} title={genre} titles={byGenre(genre)} onOpen={openModal} />
+            ))}
+          </div>
+        </motion.div>
+      ) : <Skeleton />}
       <AnimatePresence>
         {selected && (
           <TitleModal
@@ -139,24 +158,45 @@ function NotFoundPage() {
   )
 }
 
+function AnimatedRoutes() {
+  const location = useLocation()
+  const { reduced } = useMotion()
+
+  return (
+    <AnimatePresence mode="wait" initial={false}>
+      <motion.div
+        key={location.pathname}
+        initial={reduced ? false : { opacity: 0, x: 16 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={reduced ? undefined : { opacity: 0, x: -16 }}
+        transition={{ duration: reduced ? 0 : 0.25 }}
+      >
+        <ErrorBoundary>
+          <Routes location={location}>
+            <Route path="/" element={<RootLayout />}>
+              <Route index element={<Navigate to="/signin" replace />} />
+              <Route path="signin" element={<SignIn />} />
+              <Route path="profiles" element={<ProfilePicker />} />
+              <Route element={<AppLayout />}>
+                <Route path="browse" element={<RequireAuth><BrowsePage /></RequireAuth>} />
+                <Route path="browse/search" element={<RequireAuth><SearchPage /></RequireAuth>} />
+                <Route path="browse/my-list" element={<RequireAuth><MyListPage /></RequireAuth>} />
+                <Route path="watch/:id" element={<RequireAuth><Player /></RequireAuth>} />
+                <Route path="insights" element={<PlaceholderPage title="Insights" />} />
+              </Route>
+              <Route path="*" element={<NotFoundPage />} />
+            </Route>
+          </Routes>
+        </ErrorBoundary>
+      </motion.div>
+    </AnimatePresence>
+  )
+}
+
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<RootLayout />}>
-          <Route index element={<Navigate to="/signin" replace />} />
-          <Route path="signin" element={<SignIn />} />
-          <Route path="profiles" element={<ProfilePicker />} />
-          <Route element={<AppLayout />}>
-            <Route path="browse" element={<RequireAuth><BrowsePage /></RequireAuth>} />
-            <Route path="browse/search" element={<RequireAuth><SearchPage /></RequireAuth>} />
-            <Route path="browse/my-list" element={<RequireAuth><MyListPage /></RequireAuth>} />
-            <Route path="watch/:id" element={<RequireAuth><Player /></RequireAuth>} />
-            <Route path="insights" element={<PlaceholderPage title="Insights" />} />
-          </Route>
-          <Route path="*" element={<NotFoundPage />} />
-        </Route>
-      </Routes>
+      <AnimatedRoutes />
     </BrowserRouter>
   )
 }

@@ -12,10 +12,10 @@ beforeEach(() => {
   window.history.replaceState({}, '', '/browse')
 })
 
-it('rates a title from its modal', () => {
+it('rates a title from its modal', async () => {
   render(<App />)
   const title = byGenre('Focus')[0]
-  fireEvent.click(screen.getAllByRole('button', { name: `More info about ${title.name}` })[0])
+  fireEvent.click((await screen.findAllByRole('button', { name: `More info about ${title.name}` }))[0])
   fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Double thumbs up' }))
   expect(useRatings.getState().getRating('default', title.id)).toBe('double-up')
 })
@@ -28,7 +28,7 @@ afterEach(() => {
 it('opens from a card, traps focus, and restores scroll and focus after Esc', async () => {
   render(<App />)
   const title = byGenre('Focus')[0]
-  const opener = screen.getAllByRole('button', { name: `More info about ${title.name}` })[0]
+  const opener = (await screen.findAllByRole('button', { name: `More info about ${title.name}` }))[0]
   opener.focus()
   fireEvent.click(opener)
 
@@ -50,16 +50,16 @@ it('opens from a card, traps focus, and restores scroll and focus after Esc', as
 
 it('opens from More Info and closes on backdrop click', async () => {
   render(<App />)
-  fireEvent.click(screen.getByRole('button', { name: 'More Info' }))
+  fireEvent.click(await screen.findByRole('button', { name: 'More Info' }))
   expect(screen.getByRole('dialog')).toBeTruthy()
   fireEvent.click(screen.getByRole('button', { name: 'Close title details' }))
   await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
 })
 
-it('lists up to six other titles from the selected title’s primary genre', () => {
+it('lists up to six other titles from the selected title’s primary genre', async () => {
   render(<App />)
   const title = byGenre('Focus')[0]
-  fireEvent.click(screen.getAllByRole('button', { name: `More info about ${title.name}` })[0])
+  fireEvent.click((await screen.findAllByRole('button', { name: `More info about ${title.name}` }))[0])
 
   const section = within(screen.getByRole('dialog')).getByRole('region', { name: 'More like this' })
   const names = within(section).getAllByRole('button').map((button) => button.textContent)

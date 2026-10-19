@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import App from './App'
 import { useAuth } from './store/auth'
 
@@ -13,15 +13,16 @@ beforeEach(() => {
 
 afterEach(() => {
   cleanup()
+  vi.useRealTimers()
   vi.unstubAllGlobals()
 })
 
-it('shows Top 10 titles in rank order with visible numerals', () => {
+it('shows Top 10 titles in rank order with visible numerals', async () => {
   useAuth.setState({ email: 'viewer@example.com' })
   window.history.replaceState({}, '', '/browse')
   render(<App />)
 
-  const row = screen.getByRole('region', { name: 'Top 10' })
+  const row = await screen.findByRole('region', { name: 'Top 10' })
   const cards = row.querySelectorAll('[data-testid="poster-card"]')
   expect(cards).toHaveLength(10)
   expect(Array.from(cards, (card) => card.getAttribute('aria-label'))).toEqual([
@@ -32,13 +33,28 @@ it('shows Top 10 titles in rank order with visible numerals', () => {
     .toEqual(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'])
 })
 
+it('shows skeletons for 400 ms before browse content', () => {
+  vi.useFakeTimers()
+  useAuth.setState({ email: 'viewer@example.com' })
+  window.history.replaceState({}, '', '/browse')
+  render(<App />)
+
+  expect(screen.getByRole('status', { name: 'Loading browse' })).toBeTruthy()
+  expect(screen.queryByRole('region', { name: 'Top 10' })).toBeNull()
+  act(() => vi.advanceTimersByTime(399))
+  expect(screen.getByRole('status', { name: 'Loading browse' })).toBeTruthy()
+  act(() => vi.advanceTimersByTime(1))
+  expect(screen.queryByRole('status', { name: 'Loading browse' })).toBeNull()
+  expect(screen.getByRole('region', { name: 'Top 10' })).toBeTruthy()
+})
+
 it('redirects the root path to sign in', async () => {
   useAuth.setState({ email: null })
   window.history.replaceState({}, '', '/')
   render(<App />)
 
   await waitFor(() => expect(window.location.pathname).toBe('/signin'))
-  expect(screen.getByRole('heading', { name: 'Sign in' })).toBeTruthy()
+  expect(await screen.findByRole('heading', { name: 'Sign in' })).toBeTruthy()
 })
 
 it.each([
