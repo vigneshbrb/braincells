@@ -6,10 +6,10 @@ describe('catalog schema', () => {
     expect(titles.filter((title) => title.rank !== undefined).map((title) => title.rank).sort((a, b) => a! - b!))
       .toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
   })
-  it('has 30 titles with unique ids and trailers rotating over 5 MP4s', () => {
+  it('has 30 titles with unique ids and three demo video sources', () => {
     expect(titles).toHaveLength(30)
     expect(new Set(titles.map((t) => t.id)).size).toBe(30)
-    expect(new Set(titles.map((t) => t.trailerUrl)).size).toBe(5)
+    expect(new Set(titles.map((t) => t.trailerUrl)).size).toBe(3)
   })
 
   it.each(titles)('$id passes schema validation', (t) => {

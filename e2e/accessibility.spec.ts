@@ -63,5 +63,7 @@ test('sign in and profile selection have no axe violations', async ({ page }) =>
   await page.getByRole('textbox', { name: 'Email' }).fill('reader@example.com')
   await page.getByLabel('Password').fill('password123')
   await page.getByRole('button', { name: 'Sign in' }).click()
+  await expect(page.getByRole('heading', { name: "Who's watching?" })).toHaveCSS('opacity', '1')
+  await expect(page.locator('main li').first()).toHaveCSS('opacity', '1')
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([])
 })

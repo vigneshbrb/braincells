@@ -26,3 +26,5 @@ Playwright needs Chromium installed once: `npx playwright install chromium`.
 Host this project in a GitHub repository. In **Settings → Pages**, set **Build and deployment → Source** to **GitHub Actions**. Push to `main`. The [release workflow](.github/workflows/release.yml) installs dependencies, runs unit and browser tests, builds for the repository's Pages path, then publishes `dist` only when those steps pass. Pull requests run the same checks without publishing.
 
 The site URL is `https://<owner>.github.io/<repository>/`. The workflow copies `index.html` to `404.html` so refreshing a client-side route can load the app on GitHub Pages. Video URLs in the catalog point to external MP4 files; they are not bundled with the site.
+
+Demo clips: [Big Buck Bunny](https://peach.blender.org/about/) © 2008 Blender Foundation and [Sintel](https://durian.blender.org/sharing/) © Blender Foundation are used under [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/). [MDN flower](https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4) is CC0. The same credits appear in the player.

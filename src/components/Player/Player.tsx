@@ -47,7 +47,6 @@ export function Player() {
     if (!video) return
     if (video.paused) {
       video.play().catch(() => {})
-      setIsPlaying(true)
     } else {
       video.pause()
       setIsPlaying(false)
@@ -155,6 +154,11 @@ export function Player() {
             {Math.floor(currentTime)}s / {Math.floor(duration)}s
           </span>
         </div>
+        <p className="text-xs text-muted">
+          Demo footage: <a href="https://peach.blender.org/about/" className="underline">Big Buck Bunny © 2008 Blender Foundation / bigbuckbunny.org</a>;
+          {' '}<a href="https://durian.blender.org/sharing/" className="underline">Sintel © Blender Foundation | durian.blender.org</a> (CC BY 3.0);
+          {' '}<a href="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" className="underline">MDN flower</a> (CC0).
+        </p>
       </footer>
     </div>
   )

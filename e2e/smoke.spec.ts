@@ -23,4 +23,7 @@ test('sign in, select a profile, add a title, and open its player', async ({ pag
   await expect(page.getByTestId('player-video')).toHaveAttribute('src', /\.mp4$/)
   await page.getByRole('button', { name: 'Play', exact: true }).click()
   await expect(page.getByRole('button', { name: 'Pause', exact: true })).toBeVisible()
+  await expect.poll(() => page.getByTestId('player-video').evaluate(
+    (video: HTMLVideoElement) => video.currentTime,
+  )).toBeGreaterThan(0)
 })

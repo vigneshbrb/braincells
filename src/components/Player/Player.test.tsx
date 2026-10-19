@@ -68,6 +68,20 @@ describe('Player Component', () => {
     ])
   })
 
+  it('does not show Pause when the media fails to play', () => {
+    render(
+      <MemoryRouter initialEntries={['/watch/deep-work-sprint']}>
+        <Routes><Route path="/watch/:id" element={<Player />} /></Routes>
+      </MemoryRouter>,
+    )
+    const video = screen.getByTestId('player-video') as HTMLVideoElement
+    vi.spyOn(video, 'play').mockRejectedValue(new Error('media unavailable'))
+
+    fireEvent.click(screen.getByRole('button', { name: 'Play' }))
+
+    expect(screen.getByRole('button', { name: 'Play' })).toBeTruthy()
+  })
+
   it('saves progress on pause', () => {
     render(
       <MemoryRouter initialEntries={['/watch/deep-work-sprint']}>

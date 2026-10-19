@@ -1,7 +1,7 @@
 # Tasks
 
 ## 1. Implementation
-- [ ] 1.1 Write smoke spec
+- [x] 1.1 Write smoke spec
 - [x] 1.2 CI workflow (test, build, deploy)
 - [x] 1.3 README
 
