@@ -63,7 +63,7 @@ export function Hero({ titles = featured(), onMoreInfo }: HeroProps) {
       data-testid="hero"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
-      className="relative h-[70vh] min-h-96 overflow-hidden"
+      className="relative h-[70vh] min-h-[36rem] overflow-hidden"
     >
       <video
         ref={videoRef}
@@ -98,11 +98,11 @@ export function Hero({ titles = featured(), onMoreInfo }: HeroProps) {
         initial={fadeUp.initial}
         animate={fadeUp.animate}
         transition={fade}
-        className="absolute bottom-[20%] left-6 max-w-xl space-y-4 sm:left-12"
+        className="absolute inset-x-6 bottom-20 max-w-xl space-y-3 sm:inset-x-auto sm:bottom-[20%] sm:left-12 sm:space-y-4"
       >
-        <h2 className="text-4xl font-bold sm:text-6xl">{title.name}</h2>
-        <p className="text-base text-text/90 sm:text-lg">{title.synopsis}</p>
-        <div className="flex gap-3">
+        <h2 className="text-3xl font-bold sm:text-6xl">{title.name}</h2>
+        <p className="text-sm text-text/90 sm:text-lg">{title.synopsis}</p>
+        <div className="flex flex-wrap gap-2 sm:gap-3">
           <Button onClick={() => navigate(`/watch/${title.id}`)}>▶ Play</Button>
           <Button className="bg-surface/80!" onClick={handleToggle}>
             <AnimatePresence mode="wait" initial={false}>
@@ -126,7 +126,7 @@ export function Hero({ titles = featured(), onMoreInfo }: HeroProps) {
         label={muted ? 'Unmute' : 'Mute'}
         aria-pressed={!muted}
         onClick={() => setMuted((m) => !m)}
-        className="absolute right-6 bottom-[20%] bg-surface/60!"
+        className="absolute right-6 bottom-4 bg-surface/60! sm:bottom-[20%]"
       >
         {muted ? '🔇' : '🔊'}
       </IconButton>

@@ -25,9 +25,9 @@ import { useMotion } from './motion'
 
 function RootLayout() {
   return (
-    <main className="min-h-screen p-6">
+    <div className="min-h-screen p-6">
       <Outlet />
-    </main>
+    </div>
   )
 }
 

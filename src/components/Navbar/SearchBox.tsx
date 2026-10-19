@@ -59,7 +59,7 @@ export function SearchBox() {
             onChange={(event) => setQuery(event.target.value)}
             onKeyDown={(event) => { if (event.key === 'Escape') close() }}
             initial={reduced ? false : { width: 0, opacity: 0 }}
-            animate={{ width: 'min(45vw, 16rem)', opacity: 1 }}
+            animate={{ width: 'min(30vw, 16rem)', opacity: 1 }}
             exit={reduced ? undefined : { width: 0, opacity: 0 }}
             transition={{ duration: reduced ? 0 : 0.25 }}
             className="min-w-0 rounded-control border border-white/20 bg-surface px-2 py-1 text-sm text-text outline-none focus-visible:border-highlight"

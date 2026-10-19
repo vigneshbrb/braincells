@@ -33,7 +33,7 @@ export function ProfilePicker() {
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-3rem)] flex-col items-center justify-center gap-10">
+    <main className="flex min-h-[calc(100vh-3rem)] flex-col items-center justify-center gap-10">
       <motion.h1 {...fadeUp} className="font-heading text-4xl font-bold">Who's watching?</motion.h1>
       <motion.ul
         className="flex flex-wrap justify-center gap-6"
@@ -102,6 +102,6 @@ export function ProfilePicker() {
           </motion.li>
         )}
       </motion.ul>
-    </div>
+    </main>
   )
 }

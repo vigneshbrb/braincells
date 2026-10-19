@@ -4,6 +4,7 @@
   --text: #f5f5fa;
   --muted: #9a9ab0;
   --accent: #8b5cf6;
+  --accent-strong: #6b36c2;
   --highlight: #ff7a59;
   --font-body: 'Plus Jakarta Sans', sans-serif;
   --font-display: 'Sora', sans-serif;
@@ -23,6 +24,7 @@
   --color-text: var(--text);
   --color-muted: var(--muted);
   --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
   --color-highlight: var(--highlight);
   --font-sans: var(--font-body);
   --font-heading: var(--font-display);

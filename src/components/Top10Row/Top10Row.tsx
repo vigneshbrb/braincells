@@ -20,8 +20,8 @@ export function Top10Row({ onOpen }: Top10RowProps) {
       title="Top 10"
       titles={rankedTitles}
       onOpen={onOpen}
-      renderCard={(title) => (
-        <div className={`relative flex h-72 items-end ${title.rank === 10 ? 'pl-36' : 'pl-20'}`}>
+      renderCard={(title, openerTabIndex) => (
+        <div className={`relative flex h-52 items-end sm:h-72 ${title.rank === 10 ? 'pl-20 sm:pl-36' : 'pl-12 sm:pl-20'}`}>
           <motion.span
             data-testid="top10-rank"
             aria-hidden="true"
@@ -30,12 +30,12 @@ export function Top10Row({ onOpen }: Top10RowProps) {
             viewport={{ once: true }}
             transition={{ duration: reduced ? 0 : 0.45, ease: [0.2, 0.8, 0.2, 1] }}
             style={{ WebkitTextStroke: '2px var(--text)' }}
-            className="pointer-events-none absolute bottom-0 left-0 text-[10rem] font-black leading-none text-transparent"
+            className="pointer-events-none absolute bottom-0 left-0 text-[7rem] font-black leading-none text-transparent sm:text-[10rem]"
           >
             {title.rank}
           </motion.span>
           <span className="sr-only">Rank {title.rank}</span>
-          <PosterCard title={title} onOpen={onOpen} layoutId={`top10-${title.id}`} className="relative" />
+          <PosterCard title={title} onOpen={onOpen} openerTabIndex={openerTabIndex} layoutId={`top10-${title.id}`} className="relative" />
         </div>
       )}
     />

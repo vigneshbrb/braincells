@@ -10,6 +10,7 @@ import { SearchBox } from './SearchBox'
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
   const signOut = useAuth((state) => state.signOut)
@@ -59,14 +60,24 @@ export function Navbar() {
     <header
       data-testid="navbar"
       data-scrolled={scrolled}
-      className={`fixed inset-x-0 top-0 z-50 flex h-16 items-center justify-between px-6 transition-all duration-250 ${
+      className={`fixed inset-x-0 top-0 z-50 flex h-16 items-center justify-between px-3 transition-all duration-250 sm:px-6 ${
         scrolled ? 'bg-surface/90 shadow-elevated backdrop-blur-md' : 'bg-transparent'
       }`}
     >
-      <div className="flex items-center gap-8">
-        <Link to="/browse" className="font-heading text-xl font-bold tracking-wider text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-highlight">
+      <div className="flex items-center gap-2 sm:gap-8">
+        <Link to="/browse" className="font-heading text-base font-bold tracking-wider text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-highlight sm:text-xl">
           BrainCells
         </Link>
+        <button
+          type="button"
+          aria-label={mobileOpen ? 'Close navigation' : 'Open navigation'}
+          aria-expanded={mobileOpen}
+          aria-controls="mobile-navigation"
+          onClick={() => setMobileOpen((open) => !open)}
+          className="rounded-control px-2 py-1 text-xl text-text sm:hidden"
+        >
+          ☰
+        </button>
         <nav aria-label="Main" className="hidden items-center gap-6 sm:flex">
           <Link to="/browse" className="text-sm font-medium text-text transition-colors hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-highlight">
             Browse
@@ -80,7 +91,15 @@ export function Navbar() {
         </nav>
       </div>
 
-      <div className="flex items-center gap-4">
+      {mobileOpen && (
+        <nav id="mobile-navigation" aria-label="Mobile" className="absolute inset-x-0 top-full flex flex-col gap-1 bg-surface p-3 shadow-elevated sm:hidden">
+          <Link to="/browse" onClick={() => setMobileOpen(false)} className="rounded-control px-3 py-2">Browse</Link>
+          <Link to="/browse/my-list" onClick={() => setMobileOpen(false)} className="rounded-control px-3 py-2">My List</Link>
+          <Link to="/insights" onClick={() => setMobileOpen(false)} className="rounded-control px-3 py-2">Insights</Link>
+        </nav>
+      )}
+
+      <div className="flex items-center gap-2 sm:gap-4">
         <SearchBox />
 
         <div className="relative" ref={menuRef}>

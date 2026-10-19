@@ -82,7 +82,7 @@ export function getContinueWatchingList(
 ): ContinueWatchingItem[] {
   if (!profileProgress) return []
   return Object.entries(profileProgress)
-    .filter(([_, entry]) => entry.duration > 0 && entry.position / entry.duration < 0.95)
+    .filter(([, entry]) => entry.duration > 0 && entry.position / entry.duration < 0.95)
     .sort((a, b) => b[1].updatedAt - a[1].updatedAt)
     .map(([titleId, entry]) => {
       const title = allTitles.find((t) => t.id === titleId)

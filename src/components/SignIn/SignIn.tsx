@@ -35,7 +35,7 @@ export function SignIn() {
   }
 
   return (
-    <div className="relative grid min-h-[calc(100vh-3rem)] place-items-center overflow-hidden rounded-card p-6">
+    <main className="relative grid min-h-[calc(100vh-3rem)] place-items-center overflow-hidden rounded-card p-6">
       <motion.div
         aria-hidden
         data-testid="signin-background"
@@ -75,6 +75,6 @@ export function SignIn() {
         </motion.div>
         <Button type="submit">Sign in</Button>
       </motion.form>
-    </div>
+    </main>
   )
 }

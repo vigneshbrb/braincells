@@ -76,3 +76,20 @@ it('renders nothing when titles array is empty', () => {
 
   expect(container.firstChild).toBeNull()
 })
+
+it('keeps one card opener in the tab order and moves focus with arrow keys', () => {
+  render(<MemoryRouter><Row title="Focus" titles={focusTitles} onOpen={vi.fn()} /></MemoryRouter>)
+  const openers = screen.getAllByRole('button', { name: /More info about/ })
+  expect(openers.map((button) => button.tabIndex)).toEqual(openers.map((_, index) => index === 0 ? 0 : -1))
+
+  openers[0].focus()
+  fireEvent.keyDown(openers[0], { key: 'ArrowRight' })
+  expect(document.activeElement).toBe(openers[1])
+  expect(openers[0].tabIndex).toBe(-1)
+  expect(openers[1].tabIndex).toBe(0)
+
+  fireEvent.keyDown(openers[1], { key: 'End' })
+  expect(document.activeElement).toBe(openers[openers.length - 1])
+  fireEvent.keyDown(openers[openers.length - 1], { key: 'Home' })
+  expect(document.activeElement).toBe(openers[0])
+})

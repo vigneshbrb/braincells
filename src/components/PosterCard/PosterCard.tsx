@@ -18,9 +18,10 @@ export interface PosterCardProps {
   layoutId?: string
   className?: string
   progress?: number
+  openerTabIndex?: number
 }
 
-export function PosterCard({ title, onPlay, onAdd, onOpen, layoutId, className = '', progress }: PosterCardProps) {
+export function PosterCard({ title, onPlay, onAdd, onOpen, layoutId, className = '', progress, openerTabIndex }: PosterCardProps) {
   const [hovered, setHovered] = useState(false)
   const timerRef = useRef<number | null>(null)
   const navigate = useNavigate()
@@ -34,7 +35,7 @@ export function PosterCard({ title, onPlay, onAdd, onOpen, layoutId, className =
     e.stopPropagation()
     toggleTitle(activeProfileId, title.id)
     onAdd?.(title)
-  }, [activeProfileId, title.id, title, toggleTitle, onAdd])
+  }, [activeProfileId, title, toggleTitle, onAdd])
 
   const clearTimer = () => {
     if (timerRef.current !== null) {
@@ -88,12 +89,14 @@ export function PosterCard({ title, onPlay, onAdd, onOpen, layoutId, className =
       }}
       transition={{ duration: reduced ? 0 : 0.25, ease: [0.2, 0.8, 0.2, 1] }}
       style={posterStyle(title.posterSeed)}
-      className={`relative aspect-[2/3] w-44 shrink-0 cursor-pointer overflow-hidden rounded-card p-4 shadow-elevated focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-highlight ${className}`}
+      className={`relative aspect-[2/3] w-32 shrink-0 overflow-hidden rounded-card p-3 shadow-elevated sm:w-44 sm:p-4 ${className}`}
     >
       {onOpen && (
         <button
           type="button"
           aria-label={`More info about ${title.name}`}
+          data-row-card-opener=""
+          tabIndex={openerTabIndex}
           className="absolute inset-0 z-0 rounded-card focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-highlight"
           onClick={(event) => onOpen(title, event.currentTarget, layoutId ?? `title-${title.id}`)}
         />

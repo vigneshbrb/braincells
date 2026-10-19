@@ -20,7 +20,7 @@ export function Button({
       type="button"
       {...props}
       disabled={disabled}
-      className={`inline-flex items-center justify-center gap-2 rounded-control bg-accent px-4 py-2 font-semibold text-text shadow-elevated focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-highlight disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
+      className={`inline-flex items-center justify-center gap-2 rounded-control bg-accent-strong px-4 py-2 font-semibold text-text shadow-elevated focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-highlight disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
       data-pressed={pressed}
       animate={{ scale: reduced || disabled ? 1 : pressed ? 0.96 : 1 }}
       whileHover={reduced || disabled ? undefined : { scale: 1.03 }}
