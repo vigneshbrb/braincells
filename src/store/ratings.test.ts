@@ -1,9 +1,11 @@
 import { beforeEach, expect, it } from 'vitest'
 import { useRatings } from './ratings'
+import { useInsights } from './insights'
 
 beforeEach(() => {
   useRatings.setState({ ratings: {} })
   localStorage.removeItem('braincells-ratings')
+  useInsights.setState({ events: [], region: 'Europe' })
 })
 
 it('sets each sentiment and clears a repeated choice', () => {
@@ -14,6 +16,8 @@ it('sets each sentiment and clears a repeated choice', () => {
   }
   toggleRating('profile-1', 'deep-work-sprint', 'double-up')
   expect(getRating('profile-1', 'deep-work-sprint')).toBeUndefined()
+  expect(useInsights.getState().events.filter((event) => event.type === 'rate').map((event) => event.rating))
+    .toEqual(['down', 'up', 'double-up', null])
 })
 
 it('keeps ratings separate by profile and restores them from storage', async () => {

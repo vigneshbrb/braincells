@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Link, useSearchParams } from 'react-router-dom'
 import { genres, search, type Title } from '../../catalog'
 import { useMotion } from '../../motion'
+import { useInsights } from '../../store/insights'
 import { PosterCard } from '../PosterCard/PosterCard'
 import { TitleModal } from '../TitleModal/TitleModal'
 
@@ -12,6 +13,14 @@ export function SearchPage() {
   const results = search(query)
   const [selected, setSelected] = useState<{ title: Title; opener: HTMLElement; layoutId: string } | null>(null)
   const { fadeUp, stagger } = useMotion()
+  const lastTracked = useRef('')
+
+  useEffect(() => {
+    if (query && lastTracked.current !== query) {
+      useInsights.getState().track({ type: 'search', titleId: null, query })
+    }
+    lastTracked.current = query
+  }, [query])
 
   return (
     <section className="space-y-6 pb-12">

@@ -1,9 +1,11 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { useMyList } from './myList'
+import { useInsights } from './insights'
 
 describe('My List Store', () => {
   beforeEach(() => {
     useMyList.getState().clearList()
+    useInsights.setState({ events: [], region: 'Europe' })
   })
 
   it('toggles a title into and out of the list', () => {
@@ -18,6 +20,8 @@ describe('My List Store', () => {
     toggleTitle('profile-1', 'deep-work-sprint')
     expect(isInList('profile-1', 'deep-work-sprint')).toBe(false)
     expect(getList('profile-1').length).toBe(0)
+    expect(useInsights.getState().events.filter((event) => event.type === 'add').map((event) => event.titleId))
+      .toEqual(['deep-work-sprint'])
   })
 
   it('persists list across profile isolation', () => {

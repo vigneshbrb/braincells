@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { byId } from '../../catalog'
 import { useProfiles } from '../../store/profiles'
 import { useProgress } from '../../store/progress'
+import { useInsights } from '../../store/insights'
 import { useProgressSave } from './useProgressSave'
 import { IconButton } from '../IconButton/IconButton'
 
@@ -12,6 +13,7 @@ export function Player() {
   const activeProfileId = useProfiles((state) => state.activeId) || 'default'
   const getProgress = useProgress((state) => state.getProgress)
   const videoRef = useRef<HTMLVideoElement>(null)
+  const playStartedAt = useRef<number | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
@@ -77,6 +79,18 @@ export function Player() {
     setCurrentTime(newTime)
   }
 
+  const trackStop = (type: 'pause' | 'complete') => {
+    const startedAt = playStartedAt.current
+    if (startedAt === null) return
+    playStartedAt.current = null
+    useInsights.getState().track({
+      type,
+      titleId: title.id,
+      profileId: activeProfileId,
+      seconds: Math.max(0, (Date.now() - startedAt) / 1000),
+    })
+  }
+
   return (
     <div data-testid="player-view" className="-mx-6 -mt-20 relative flex min-h-screen flex-col bg-background text-text">
       <header className="absolute top-0 inset-x-0 z-20 flex items-center justify-between p-6 bg-gradient-to-b from-background/90 to-transparent">
@@ -100,8 +114,16 @@ export function Player() {
           playsInline
           onTimeUpdate={handleTimeUpdate}
           onLoadedMetadata={handleLoadedMetadata}
-          onPlay={() => setIsPlaying(true)}
-          onPause={() => setIsPlaying(false)}
+          onPlay={() => {
+            setIsPlaying(true)
+            playStartedAt.current = Date.now()
+            useInsights.getState().track({ type: 'play', titleId: title.id, profileId: activeProfileId })
+          }}
+          onPause={() => {
+            setIsPlaying(false)
+            if (!videoRef.current?.ended) trackStop('pause')
+          }}
+          onEnded={() => { setIsPlaying(false); trackStop('complete') }}
           onClick={togglePlay}
           className="max-h-screen w-full object-contain cursor-pointer"
         />

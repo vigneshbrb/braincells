@@ -3,6 +3,7 @@ import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { useProfiles } from '../../store/profiles'
 import { useProgress } from '../../store/progress'
+import { useInsights } from '../../store/insights'
 import { Player } from './Player'
 
 describe('Player Component', () => {
@@ -10,6 +11,7 @@ describe('Player Component', () => {
     vi.useFakeTimers()
     useProfiles.setState({ activeId: 'test-profile' })
     useProgress.setState({ progress: {} })
+    useInsights.setState({ events: [], region: 'Europe' })
   })
 
   afterEach(() => {
@@ -42,6 +44,28 @@ describe('Player Component', () => {
     expect(saved).toBeDefined()
     expect(saved?.position).toBe(30)
     expect(saved?.duration).toBe(100)
+  })
+
+  it('records play, watched seconds on pause, and completion', () => {
+    render(
+      <MemoryRouter initialEntries={['/watch/deep-work-sprint']}>
+        <Routes><Route path="/watch/:id" element={<Player />} /></Routes>
+      </MemoryRouter>,
+    )
+    const video = screen.getByTestId('player-video') as HTMLVideoElement
+    Object.defineProperty(video, 'duration', { value: 100, configurable: true })
+    fireEvent.play(video)
+    act(() => vi.advanceTimersByTime(12_000))
+    fireEvent.pause(video)
+    fireEvent.play(video)
+    act(() => vi.advanceTimersByTime(8_000))
+    fireEvent.ended(video)
+    expect(useInsights.getState().events.map(({ type, seconds, region }) => ({ type, seconds, region }))).toEqual([
+      { type: 'play', seconds: undefined, region: 'Europe' },
+      { type: 'pause', seconds: 12, region: 'Europe' },
+      { type: 'play', seconds: undefined, region: 'Europe' },
+      { type: 'complete', seconds: 8, region: 'Europe' },
+    ])
   })
 
   it('saves progress on pause', () => {

@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { useInsights } from './insights'
 
 export type Rating = 'down' | 'up' | 'double-up'
 
@@ -13,12 +14,16 @@ export const useRatings = create<RatingsState>()(
   persist(
     (set, get) => ({
       ratings: {},
-      toggleRating: (profileId, titleId, rating) => set((state) => {
-        const profileRatings = { ...state.ratings[profileId] }
-        if (profileRatings[titleId] === rating) delete profileRatings[titleId]
-        else profileRatings[titleId] = rating
-        return { ratings: { ...state.ratings, [profileId]: profileRatings } }
-      }),
+      toggleRating: (profileId, titleId, rating) => {
+        const next = get().ratings[profileId]?.[titleId] === rating ? null : rating
+        set((state) => {
+          const profileRatings = { ...state.ratings[profileId] }
+          if (next === null) delete profileRatings[titleId]
+          else profileRatings[titleId] = next
+          return { ratings: { ...state.ratings, [profileId]: profileRatings } }
+        })
+        useInsights.getState().track({ type: 'rate', titleId, profileId, rating: next })
+      },
       getRating: (profileId, titleId) => get().ratings[profileId]?.[titleId],
     }),
     { name: 'braincells-ratings', partialize: (state) => ({ ratings: state.ratings }) },

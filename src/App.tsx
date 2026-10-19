@@ -7,6 +7,7 @@ import type { Title } from './catalog'
 import { ContinueRow } from './components/ContinueRow/ContinueRow'
 import { ErrorBoundary } from './components/ErrorBoundary/ErrorBoundary'
 import { Hero } from './components/Hero/Hero'
+import { Insights } from './components/Insights/Insights'
 import { MyListRow } from './components/MyListRow/MyListRow'
 import { Navbar } from './components/Navbar/Navbar'
 import { Player } from './components/Player/Player'
@@ -16,6 +17,7 @@ import { RequireAuth } from './components/RequireAuth/RequireAuth'
 import { Row } from './components/Row/Row'
 import { SignIn } from './components/SignIn/SignIn'
 import { SearchPage } from './components/SearchPage/SearchPage'
+import { Settings } from './components/Settings/Settings'
 import { Skeleton } from './components/Skeleton/Skeleton'
 import { TitleModal } from './components/TitleModal/TitleModal'
 import { Top10Row } from './components/Top10Row/Top10Row'
@@ -40,10 +42,6 @@ function AppLayout() {
       </main>
     </div>
   )
-}
-
-function PlaceholderPage({ title }: { title: string }) {
-  return <h1>{title}</h1>
 }
 
 function BrowsePage() {
@@ -182,7 +180,8 @@ function AnimatedRoutes() {
                 <Route path="browse/search" element={<RequireAuth><SearchPage /></RequireAuth>} />
                 <Route path="browse/my-list" element={<RequireAuth><MyListPage /></RequireAuth>} />
                 <Route path="watch/:id" element={<RequireAuth><Player /></RequireAuth>} />
-                <Route path="insights" element={<PlaceholderPage title="Insights" />} />
+                <Route path="settings" element={<RequireAuth><Settings /></RequireAuth>} />
+                <Route path="insights" element={<RequireAuth><Insights /></RequireAuth>} />
               </Route>
               <Route path="*" element={<NotFoundPage />} />
             </Route>

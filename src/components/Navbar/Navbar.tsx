@@ -142,6 +142,9 @@ export function Navbar() {
                   <p className="truncate text-sm font-medium text-text">{activeProfile?.name ?? 'User'}</p>
                 </div>
                 <div className="py-1">
+                  <Link to="/settings" role="menuitem" onClick={() => setMenuOpen(false)} className="flex w-full items-center rounded-control px-3 py-2 text-sm text-text transition-colors hover:bg-white/5 hover:text-accent">
+                    Settings
+                  </Link>
                   <button type="button" role="menuitem" onClick={handleSwitchProfile} className="flex w-full items-center px-3 py-2 text-left text-sm text-text transition-colors hover:bg-white/5 hover:text-accent rounded-control">
                     Switch profile
                   </button>

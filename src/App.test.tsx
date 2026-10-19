@@ -1,7 +1,8 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
-import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import App from './App'
 import { useAuth } from './store/auth'
+import { useInsights } from './store/insights'
 
 beforeEach(() => {
   vi.stubGlobal('IntersectionObserver', class {
@@ -82,11 +83,49 @@ it('shows a not-found page with a home link for unknown paths', () => {
 })
 
 it('shows search results for a matching query', () => {
+  useInsights.setState({ events: [], region: 'Europe' })
   useAuth.setState({ email: 'viewer@example.com' })
   window.history.replaceState({}, '', '/browse/search?q=focus')
   render(<App />)
   expect(screen.getByRole('heading', { name: 'Search results' })).toBeTruthy()
   expect(screen.getAllByTestId('poster-card').length).toBeGreaterThan(0)
+  expect(useInsights.getState().events).toEqual([
+    expect.objectContaining({ type: 'search', titleId: null, query: 'focus', region: 'Europe' }),
+  ])
+})
+
+it('changes the region used for new events from settings', () => {
+  useAuth.setState({ email: 'viewer@example.com' })
+  useInsights.setState({ events: [], region: 'Asia Pacific' })
+  window.history.replaceState({}, '', '/settings')
+  render(<App />)
+
+  fireEvent.change(screen.getByRole('combobox', { name: 'Region' }), { target: { value: 'Europe' } })
+  useInsights.getState().track({ type: 'play', titleId: 'deep-work-sprint' })
+  const events = useInsights.getState().events
+  expect(events[events.length - 1]?.region).toBe('Europe')
+})
+
+it('shows separate region figures and accessible charts on Insights', () => {
+  useAuth.setState({ email: 'viewer@example.com' })
+  useInsights.setState({ events: [], region: 'Asia Pacific' })
+  const { track, setRegion } = useInsights.getState()
+  track({ type: 'play', titleId: 'deep-work-sprint' })
+  track({ type: 'complete', titleId: 'deep-work-sprint', seconds: 120 })
+  setRegion('Europe')
+  track({ type: 'play', titleId: 'sleep-reset' })
+  track({ type: 'pause', titleId: 'sleep-reset', seconds: 60 })
+  window.history.replaceState({}, '', '/insights')
+  render(<App />)
+
+  const asia = within(screen.getByRole('region', { name: 'Asia Pacific' }))
+  const europe = within(screen.getByRole('region', { name: 'Europe' }))
+  expect(asia.getByText('2 min')).toBeTruthy()
+  expect(asia.getByText('100%')).toBeTruthy()
+  expect(europe.getByText('1 min')).toBeTruthy()
+  expect(europe.getByText('0%')).toBeTruthy()
+  expect(asia.getByRole('img', { name: 'Top genres in Asia Pacific' })).toBeTruthy()
+  expect(europe.getByRole('img', { name: 'Ratings in Europe' })).toBeTruthy()
 })
 
 it('shows popular genre suggestions when search has no matches', () => {
