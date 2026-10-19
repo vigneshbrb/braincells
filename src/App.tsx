@@ -11,6 +11,7 @@ import { ProfilePicker } from './components/ProfilePicker/ProfilePicker'
 import { RequireAuth } from './components/RequireAuth/RequireAuth'
 import { Row } from './components/Row/Row'
 import { SignIn } from './components/SignIn/SignIn'
+import { SearchPage } from './components/SearchPage/SearchPage'
 import { TitleModal } from './components/TitleModal/TitleModal'
 
 function RootLayout() {
@@ -91,6 +92,7 @@ function App() {
           <Route path="profiles" element={<ProfilePicker />} />
           <Route element={<AppLayout />}>
             <Route path="browse" element={<RequireAuth><BrowsePage /></RequireAuth>} />
+            <Route path="browse/search" element={<RequireAuth><SearchPage /></RequireAuth>} />
             <Route path="watch/:id" element={<RequireAuth><Player /></RequireAuth>} />
             <Route path="insights" element={<PlaceholderPage title="Insights" />} />
           </Route>

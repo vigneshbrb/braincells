@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { byGenre, byId, featured, genres, posterStyle, titles } from '.'
+import { byGenre, byId, featured, genres, posterStyle, search, titles } from '.'
 
 describe('catalog schema', () => {
   it('has 30 titles with unique ids and trailers rotating over 5 MP4s', () => {
@@ -28,6 +28,19 @@ describe('catalog schema', () => {
 })
 
 describe('selectors', () => {
+  it('ranks name matches before genre and synopsis matches, ignoring case', () => {
+    const results = search('FOCUS')
+    expect(results.length).toBeGreaterThan(0)
+    const nameMatches = results.filter((title) => title.name.toLowerCase().includes('focus'))
+    expect(results.slice(0, nameMatches.length)).toEqual(nameMatches)
+    expect(results.some((title) => title.genres.includes('Focus'))).toBe(true)
+  })
+
+  it('returns no results for blank or unmatched queries', () => {
+    expect(search('   ')).toEqual([])
+    expect(search('zzzz')).toEqual([])
+  })
+
   it('byGenre returns only titles tagged with that genre', () => {
     const focus = byGenre('Focus')
     expect(focus.length).toBeGreaterThan(0)

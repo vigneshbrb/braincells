@@ -18,6 +18,21 @@ export function featured(): Title[] {
   return titles.filter((title) => title.featured)
 }
 
+export function search(query: string): Title[] {
+  const term = query.trim().toLowerCase()
+  if (!term) return []
+  return titles
+    .map((title, index) => {
+      const rank = title.name.toLowerCase().includes(term) ? 0
+        : title.genres.some((genre) => genre.toLowerCase().includes(term)) ? 1
+          : title.synopsis.toLowerCase().includes(term) ? 2 : 3
+      return { title, index, rank }
+    })
+    .filter(({ rank }) => rank < 3)
+    .sort((a, b) => a.rank - b.rank || a.index - b.index)
+    .map(({ title }) => title)
+}
+
 function hash(seed: string) {
   let h = 2166136261
   for (let i = 0; i < seed.length; i++) {
