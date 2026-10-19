@@ -1,8 +1,10 @@
-import { useEffect, useRef, useState } from 'react'
-import { motion } from 'framer-motion'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { posterStyle, type Title } from '../../catalog'
 import { useMotion } from '../../motion'
+import { useProfiles } from '../../store/profiles'
+import { selectMyList, useMyList } from '../../store/myList'
 import { Button } from '../Button/Button'
 
 export const HOVER_DELAY = 300
@@ -22,6 +24,16 @@ export function PosterCard({ title, onPlay, onAdd, onOpen, layoutId, className =
   const timerRef = useRef<number | null>(null)
   const navigate = useNavigate()
   const { reduced } = useMotion()
+  const activeProfileId = useProfiles((state) => state.activeId) || 'default'
+  const titleIds = useMyList(selectMyList(activeProfileId))
+  const isInList = useMemo(() => (titleIds || []).includes(title.id), [titleIds, title.id])
+  const toggleTitle = useMyList((state) => state.toggleTitle)
+
+  const handleToggle = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation()
+    toggleTitle(activeProfileId, title.id)
+    onAdd?.(title)
+  }, [activeProfileId, title.id, title, toggleTitle, onAdd])
 
   const clearTimer = () => {
     if (timerRef.current !== null) {
@@ -117,14 +129,21 @@ export function PosterCard({ title, onPlay, onAdd, onOpen, layoutId, className =
                 ▶
               </Button>
               <Button
-                aria-label="Add"
+                aria-label={isInList ? 'Remove from My List' : 'Add to My List'}
                 className="size-8 bg-surface/80! p-0! text-xs font-bold"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onAdd?.(title)
-                }}
+                onClick={handleToggle}
               >
-                +
+                <AnimatePresence mode="wait" initial={false}>
+                  <motion.span
+                    key={isInList ? 'check' : 'plus'}
+                    initial={{ opacity: 0, scale: 0.5, rotate: -90 }}
+                    animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                    exit={{ opacity: 0, scale: 0.5, rotate: 90 }}
+                    transition={{ duration: reduced ? 0 : 0.2 }}
+                  >
+                    {isInList ? '✓' : '+'}
+                  </motion.span>
+                </AnimatePresence>
               </Button>
             </motion.div>
           )}

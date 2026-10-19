@@ -72,7 +72,7 @@ it('reveals Play and Add quick actions after hovering 300 ms', () => {
   expect(card.getAttribute('data-hovered')).toBe('true')
 
   const playBtn = screen.getByRole('button', { name: 'Play' })
-  const addBtn = screen.getByRole('button', { name: 'Add' })
+  const addBtn = screen.getByRole('button', { name: /Add to My List/i })
   expect(playBtn).toBeTruthy()
   expect(addBtn).toBeTruthy()
 

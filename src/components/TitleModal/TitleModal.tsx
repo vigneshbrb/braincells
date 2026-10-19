@@ -1,8 +1,10 @@
-import { useEffect, useRef } from 'react'
-import { motion } from 'framer-motion'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { posterStyle, titles, type Title } from '../../catalog'
 import { useMotion } from '../../motion'
+import { useProfiles } from '../../store/profiles'
+import { selectMyList, useMyList } from '../../store/myList'
 import { Button } from '../Button/Button'
 
 interface TitleModalProps {
@@ -18,9 +20,17 @@ export function TitleModal({ title, layoutId, opener, onClose, onSelect }: Title
   const closeRef = useRef<HTMLButtonElement>(null)
   const navigate = useNavigate()
   const { reduced } = useMotion()
+  const activeProfileId = useProfiles((state) => state.activeId) || 'default'
+  const titleIds = useMyList(selectMyList(activeProfileId))
+  const isInList = useMemo(() => (titleIds || []).includes(title.id), [titleIds, title.id])
+  const toggleTitle = useMyList((state) => state.toggleTitle)
   const similar = titles.filter((candidate) =>
     candidate.id !== title.id && candidate.genres.includes(title.genres[0]),
   ).slice(0, 6)
+
+  const handleToggle = useCallback(() => {
+    toggleTitle(activeProfileId, title.id)
+  }, [activeProfileId, title.id, toggleTitle])
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow
@@ -101,7 +111,23 @@ export function TitleModal({ title, layoutId, opener, onClose, onSelect }: Title
           </p>
           <p>{title.synopsis}</p>
           <p className="text-sm text-muted">{title.genres.join(' · ')}</p>
-          <Button onClick={() => navigate(`/watch/${title.id}`)}>▶ Play</Button>
+          <div className="flex gap-3">
+            <Button onClick={() => navigate(`/watch/${title.id}`)}>▶ Play</Button>
+            <Button className="bg-surface/80!" onClick={handleToggle}>
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.span
+                  key={isInList ? 'check' : 'plus'}
+                  initial={{ opacity: 0, scale: 0.5, rotate: -90 }}
+                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                  exit={{ opacity: 0, scale: 0.5, rotate: 90 }}
+                  transition={{ duration: reduced ? 0 : 0.2 }}
+                >
+                  {isInList ? '✓' : '+'}
+                </motion.span>
+              </AnimatePresence>
+              <span className="ml-1.5">{isInList ? 'In My List' : 'My List'}</span>
+            </Button>
+          </div>
           {similar.length > 0 && (
             <section aria-label="More like this" className="space-y-3">
               <h3 className="font-heading text-xl font-bold">More like this</h3>

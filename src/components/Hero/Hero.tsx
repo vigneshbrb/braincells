@@ -1,8 +1,10 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { featured, posterStyle, type Title } from '../../catalog'
 import { useMotion } from '../../motion'
+import { useProfiles } from '../../store/profiles'
+import { selectMyList, useMyList } from '../../store/myList'
 import { Button } from '../Button/Button'
 import { IconButton } from '../IconButton/IconButton'
 
@@ -22,8 +24,16 @@ export function Hero({ titles = featured(), onMoreInfo }: HeroProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const navigate = useNavigate()
   const { reduced, fadeUp } = useMotion()
+  const activeProfileId = useProfiles((state) => state.activeId) || 'default'
   const title = titles[index % titles.length]
+  const titleIds = useMyList(selectMyList(activeProfileId))
+  const isInList = useMemo(() => (titleIds || []).includes(title.id), [titleIds, title.id])
+  const toggleTitle = useMyList((state) => state.toggleTitle)
   const fade = { duration: reduced ? 0 : 0.45, ease: fadeUp.transition.ease }
+
+  const handleToggle = useCallback(() => {
+    toggleTitle(activeProfileId, title.id)
+  }, [activeProfileId, title.id, toggleTitle])
 
   useEffect(() => {
     setPlaying(false)
@@ -94,6 +104,20 @@ export function Hero({ titles = featured(), onMoreInfo }: HeroProps) {
         <p className="text-base text-text/90 sm:text-lg">{title.synopsis}</p>
         <div className="flex gap-3">
           <Button onClick={() => navigate(`/watch/${title.id}`)}>▶ Play</Button>
+          <Button className="bg-surface/80!" onClick={handleToggle}>
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.span
+                key={isInList ? 'check' : 'plus'}
+                initial={{ opacity: 0, scale: 0.5, rotate: -90 }}
+                animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                exit={{ opacity: 0, scale: 0.5, rotate: 90 }}
+                transition={{ duration: reduced ? 0 : 0.2 }}
+              >
+                {isInList ? '✓' : '+'}
+              </motion.span>
+            </AnimatePresence>
+            <span className="ml-1.5">{isInList ? 'In My List' : 'My List'}</span>
+          </Button>
           <Button className="bg-surface/80!" onClick={(event) => onMoreInfo?.(title, event.currentTarget)}>More Info</Button>
         </div>
       </motion.div>
