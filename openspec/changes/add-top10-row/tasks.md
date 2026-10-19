@@ -9,4 +9,4 @@
 - [x] 2.1 Test: order and numerals
 
 ## 3. Ship
-- [ ] 3.1 Run test, build, validate, commit
+- [x] 3.1 Run test, build, validate, commit
