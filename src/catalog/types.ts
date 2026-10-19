@@ -16,4 +16,5 @@ export interface Title {
   trailerUrl: string
   posterSeed: string
   featured: boolean
+  rank?: number
 }

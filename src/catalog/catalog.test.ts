@@ -2,6 +2,10 @@ import { describe, expect, it } from 'vitest'
 import { byGenre, byId, featured, genres, posterStyle, search, titles } from '.'
 
 describe('catalog schema', () => {
+  it('contains exactly one title for each Top 10 rank', () => {
+    expect(titles.filter((title) => title.rank !== undefined).map((title) => title.rank).sort((a, b) => a! - b!))
+      .toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+  })
   it('has 30 titles with unique ids and trailers rotating over 5 MP4s', () => {
     expect(titles).toHaveLength(30)
     expect(new Set(titles.map((t) => t.id)).size).toBe(30)

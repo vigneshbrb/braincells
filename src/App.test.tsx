@@ -1,9 +1,36 @@
-import { afterEach, expect, it } from 'vitest'
+import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import App from './App'
 import { useAuth } from './store/auth'
 
-afterEach(() => cleanup())
+beforeEach(() => {
+  vi.stubGlobal('IntersectionObserver', class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  })
+})
+
+afterEach(() => {
+  cleanup()
+  vi.unstubAllGlobals()
+})
+
+it('shows Top 10 titles in rank order with visible numerals', () => {
+  useAuth.setState({ email: 'viewer@example.com' })
+  window.history.replaceState({}, '', '/browse')
+  render(<App />)
+
+  const row = screen.getByRole('region', { name: 'Top 10' })
+  const cards = row.querySelectorAll('[data-testid="poster-card"]')
+  expect(cards).toHaveLength(10)
+  expect(Array.from(cards, (card) => card.getAttribute('aria-label'))).toEqual([
+    'Deep Work Sprint', 'Growth Curve', 'Sleep Reset', 'Systems, Not Goals', 'The Quiet Hour',
+    'The Reframe', 'Move Daily', 'The Blank Page', 'Attention Architects', 'Signal and Noise',
+  ])
+  expect(Array.from(row.querySelectorAll('[data-testid="top10-rank"]'), (rank) => rank.textContent))
+    .toEqual(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'])
+})
 
 it('redirects the root path to sign in', async () => {
   useAuth.setState({ email: null })

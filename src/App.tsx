@@ -16,6 +16,7 @@ import { Row } from './components/Row/Row'
 import { SignIn } from './components/SignIn/SignIn'
 import { SearchPage } from './components/SearchPage/SearchPage'
 import { TitleModal } from './components/TitleModal/TitleModal'
+import { Top10Row } from './components/Top10Row/Top10Row'
 import { useProfiles } from './store/profiles'
 import { selectMyList, useMyList } from './store/myList'
 
@@ -60,6 +61,7 @@ function BrowsePage() {
       <div className="space-y-6">
         <ContinueRow onOpen={openModal} />
         <MyListRow onOpen={openModal} />
+        <Top10Row onOpen={openModal} />
         {genres.map((genre) => (
           <Row key={genre} title={genre} titles={byGenre(genre)} onOpen={openModal} />
         ))}
